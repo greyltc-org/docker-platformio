@@ -25,6 +25,8 @@ jobs:
     permissions:
       packages: write
       contents: write
+    env:
+      MAIN_PACKAGE_NAME: platformio
 
     steps:
       - name: Checkout repo
@@ -52,16 +54,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          tags: |
-            type=raw,value=${{ env.THIS_VERSTRING }}
-          flavor: |
-            latest=true
-          images: ghcr.io/${{ github.repository }}
-
       - name: Docker build
         uses: docker/build-push-action@v2
         with:
@@ -70,9 +62,21 @@ jobs:
 
       - name: Test the container
         id: test
-        run: docker run --rm test bash -c "set -o pipefail; pacman -Q ${PACKAGE_FOR_VERSION} | cut -d ' ' -f2"
-        env:
-          PACKAGE_FOR_VERSION: platformio
+        run: |
+          set -eo pipefail
+          docker run --rm test bash -c "set -eo pipefail; pacman -Q ${{ env.MAIN_PACKAGE_NAME }} | cut -d ' ' -f2" | tee ver
+          echo "::set-output name=PKG_VER::$(cat ver)"
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          tags: |
+            type=raw,value=${{ env.THIS_VERSTRING }}
+            type=raw,value=${{ steps.test.outputs.PKG_VER }}
+          flavor: |
+            latest=true
+          images: ghcr.io/${{ github.repository_owner }}/${{ env.MAIN_PACKAGE_NAME }}
 
       # Push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -88,7 +92,9 @@ jobs:
         run: |
           git config --global user.name 'GitHub Actions Robot'
           git config --global user.email 'github@actions.robot'
-          git tag -a "v${{ env.THIS_VERSTRING }}" -m "rebuilt"
+          git tag -d "${{ steps.test.outputs.PKG_VER }}" || echo "${{ steps.test.outputs.PKG_VER }} wasn't there"
+          git tag -a "${{ steps.test.outputs.PKG_VER }}" -m "Built via ${{ env.THIS_VERSTRING }}"
+          git tag -a "v${{ env.THIS_VERSTRING }}" -m "Has ${{ env.PACKAGE_FOR_VERSION }} ${{ steps.test.outputs.PKG_VER }}"
           git push -u origin ${{ env.GITHUB_BASE_REF}} --tags
 
       # https://docs.github.com/en/rest/reference/releases#create-a-release
@@ -99,7 +105,7 @@ jobs:
             --url https://api.github.com/repos/${{ github.repository }}/releases \
             --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
             --header "Accept: application/vnd.github.v3+json" \
-            --data '{"draft":false,"tag_name":"v${{ env.THIS_VERSTRING }}","name":"Version ${{ env.THIS_VERSTRING }}"}' \
+            --data '{"draft":false,"tag_name":"v${{ env.THIS_VERSTRING }}","name":"${{ env.PACKAGE_FOR_VERSION }} ${{ steps.test.outputs.PKG_VER }} via ${{ env.THIS_VERSTRING }}"}' \
             --output rel_resp.json
           echo "Release Done."
           ASSET_UL_URL=$(cat rel_resp.json | jq --raw-output '.upload_url' | sed "s|{?.*||g")
