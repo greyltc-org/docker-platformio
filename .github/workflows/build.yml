@@ -92,8 +92,6 @@ jobs:
         run: |
           git config --global user.name 'GitHub Actions Robot'
           git config --global user.email 'github@actions.robot'
-          git tag -d "${{ steps.test.outputs.PKG_VER }}" || echo "${{ steps.test.outputs.PKG_VER }} wasn't there"
-          git tag -a "${{ steps.test.outputs.PKG_VER }}" -m "Built via ${{ env.THIS_VERSTRING }}"
           git tag -a "v${{ env.THIS_VERSTRING }}" -m "Has ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }}"
           git push -u origin ${{ env.GITHUB_BASE_REF}} --tags
 
