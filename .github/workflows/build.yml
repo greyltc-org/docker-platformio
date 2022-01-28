@@ -89,7 +89,7 @@ jobs:
           git config --global user.name 'GitHub Actions Robot'
           git config --global user.email 'github@actions.robot'
           git tag -a "v${{ env.THIS_VERSTRING }}" -m "rebuilt"
-          git push -u origin master --tags
+          git push -u origin ${{ env.GITHUB_BASE_REF}} --tags
 
       # https://docs.github.com/en/rest/reference/releases#create-a-release
       - name: Make release
