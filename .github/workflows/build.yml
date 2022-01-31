@@ -27,6 +27,7 @@ jobs:
       contents: write
     env:
       MAIN_PACKAGE_NAME: platformio
+      ACTIONS_BOT_NAME: github-actions[bot]
 
     steps:
       - name: Checkout repo
@@ -87,11 +88,23 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Get Actions Bot ID
+        id: gbid
+        if: github.event_name != 'pull_request'
+        run: |
+          curl --silent \
+          --url https://api.github.com/users/$(printf %s \'${ACTIONS_BOT_NAME}\'|jq -sRr @uri) \
+          --output bot_info.json
+          echo "::set-output name=bot-id::$(cat bot_info.json | jq --raw-output '.id')"
+
       - name: Tag
         if: github.event_name != 'pull_request'
         run: |
-          git config --global user.name 'GitHub Actions Robot'
-          git config --global user.email 'github@actions.robot'
+          echo "${{ env.THIS_VERSTRING }} ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }}" > VERSION
+          git config --global user.name "${ACTIONS_BOT_NAME}"
+          git config --global user.email "${{ steps.gbid.outputs.bot-id }}+${ACTIONS_BOT_NAME}@users.noreply.github.com"
+          git add VERSION
+          git commit -m "Update version"
           git tag -a "v${{ env.THIS_VERSTRING }}" -m "Has ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }}"
           git push -u origin ${{ env.GITHUB_BASE_REF}} --tags
 
