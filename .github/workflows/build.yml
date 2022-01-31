@@ -97,7 +97,7 @@ jobs:
           --output bot_info.json
           echo "::set-output name=bot-id::$(cat bot_info.json | jq --raw-output '.id')"
 
-      - name: Tag
+      - name: Bump, commit VERSION and tag
         if: github.event_name != 'pull_request'
         run: |
           echo "${{ env.THIS_VERSTRING }} ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }}" > VERSION
@@ -106,7 +106,7 @@ jobs:
           git add VERSION
           git commit -m "Update version"
           git tag -a "v${{ env.THIS_VERSTRING }}" -m "Has ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }}"
-          git push -u origin ${{ env.GITHUB_BASE_REF}} --tags
+          git push -u origin $(git rev-parse --abbrev-ref HEAD) --tags
 
       # https://docs.github.com/en/rest/reference/releases#create-a-release
       - name: Make release
