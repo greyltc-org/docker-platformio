@@ -1,2 +1,4 @@
 FROM ghcr.io/greyltc-org/archlinux-aur
-RUN aur-install platformio
+
+ADD install-platformio.sh /sbin/install-platformio
+RUN install-platformio
