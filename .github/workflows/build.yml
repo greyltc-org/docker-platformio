@@ -55,6 +55,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Bump VERSION and tag
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "${{ env.THIS_VERSTRING }} ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }}" > VERSION
+          git config --global user.name "${ACTIONS_BOT_NAME}"
+          git config --global user.email "${{ steps.gbid.outputs.bot-id }}+${ACTIONS_BOT_NAME}@users.noreply.github.com"
+          git add VERSION
+          git commit -m "${{ env.THIS_VERSTRING }} version update"
+          git tag -a "v${{ env.THIS_VERSTRING }}" -m "Has ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }}"
+
       - name: Docker build
         uses: docker/build-push-action@v2
         with:
@@ -67,6 +77,10 @@ jobs:
           set -eo pipefail
           docker run --rm test bash -c "set -eo pipefail; pacman -Q ${{ env.MAIN_PACKAGE_NAME }} | cut -d ' ' -f2" | tee ver
           echo "::set-output name=PKG_VER::$(cat ver)"
+      
+      - name: Push
+        if: github.event_name != 'pull_request'
+        run: git push -u origin $(git rev-parse --abbrev-ref HEAD) --tags
 
       - name: Docker meta
         id: meta
@@ -96,17 +110,6 @@ jobs:
           --url https://api.github.com/users/$(printf %s \'${ACTIONS_BOT_NAME}\'|jq -sRr @uri) \
           --output bot_info.json
           echo "::set-output name=bot-id::$(cat bot_info.json | jq --raw-output '.id')"
-
-      - name: Bump, commit VERSION and tag
-        if: github.event_name != 'pull_request'
-        run: |
-          echo "${{ env.THIS_VERSTRING }} ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }}" > VERSION
-          git config --global user.name "${ACTIONS_BOT_NAME}"
-          git config --global user.email "${{ steps.gbid.outputs.bot-id }}+${ACTIONS_BOT_NAME}@users.noreply.github.com"
-          git add VERSION
-          git commit -m "Update version"
-          git tag -a "v${{ env.THIS_VERSTRING }}" -m "Has ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }}"
-          git push -u origin $(git rev-parse --abbrev-ref HEAD) --tags
 
       # https://docs.github.com/en/rest/reference/releases#create-a-release
       - name: Make release
