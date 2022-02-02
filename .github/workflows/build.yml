@@ -42,7 +42,7 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           curl --silent \
-          --url https://api.github.com/users/$(printf %s \'${ACTIONS_BOT_NAME}\'|jq -sRr @uri) \
+          --url https://api.github.com/users/$(printf %s "${ACTIONS_BOT_NAME}"|jq -sRr @uri) \
           --output bot_info.json
           echo "::set-output name=bot-id::$(cat bot_info.json | jq --raw-output '.id')"
 
