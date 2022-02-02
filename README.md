@@ -1,3 +1,4 @@
+[![CI](https://github.com/greyltc-org/docker-platformio/actions/workflows/build.yml/badge.svg)](https://github.com/greyltc-org/docker-platformio/actions/workflows/build.yml)
 # docker-platformio
 Arch Linux based docker container with platformio
 
