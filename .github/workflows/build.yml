@@ -54,16 +54,27 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Get version from AUR
+        id: getvver
+        run: |
+          curl --silent \
+          --get \
+          --data v=5 \
+          --data type=info \
+          --data arg=${{ env.MAIN_PACKAGE_NAME }} \
+          --url https://aur.archlinux.org/rpc \
+          --output pkg_info.json
+          echo "::set-output name=remote_ver::$(cat pkg_info.json | jq --raw-output '.results[0].Version')"
 
-      - name: Bump VERSION and tag
+      - name: Bump VERSION
         if: github.event_name != 'pull_request'
         run: |
-          echo "${{ env.THIS_VERSTRING }} ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }}" > VERSION
+          echo "${{ env.THIS_VERSTRING }} ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.getvver.outputs.remote_ver }}" > VERSION
           git config --global user.name "${ACTIONS_BOT_NAME}"
           git config --global user.email "${{ steps.gbid.outputs.bot-id }}+${ACTIONS_BOT_NAME}@users.noreply.github.com"
           git add VERSION
           git commit -m "${{ env.THIS_VERSTRING }} version update"
-          git tag -a "v${{ env.THIS_VERSTRING }}" -m "Has ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }}"
 
       - name: Docker build
         uses: docker/build-push-action@v2
@@ -78,9 +89,11 @@ jobs:
           docker run --rm test bash -c "set -eo pipefail; pacman -Q ${{ env.MAIN_PACKAGE_NAME }} | cut -d ' ' -f2" | tee ver
           echo "::set-output name=PKG_VER::$(cat ver)"
       
-      - name: Push
+      - name: Tag & Push
         if: github.event_name != 'pull_request'
-        run: git push -u origin $(git rev-parse --abbrev-ref HEAD) --tags
+        run: |
+          git tag -a "v${{ env.THIS_VERSTRING }}" -m "Has ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }}"
+          git push -u origin $(git rev-parse --abbrev-ref HEAD) --tags
 
       - name: Docker meta
         id: meta
