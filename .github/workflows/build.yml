@@ -37,6 +37,15 @@ jobs:
         id: date
         run: echo "TODAY_IS=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
+      - name: Get Actions Bot ID
+        id: gbid
+        if: github.event_name != 'pull_request'
+        run: |
+          curl --silent \
+          --url https://api.github.com/users/$(printf %s \'${ACTIONS_BOT_NAME}\'|jq -sRr @uri) \
+          --output bot_info.json
+          echo "::set-output name=bot-id::$(cat bot_info.json | jq --raw-output '.id')"
+
       - name: Generate version string
         id: versionstring
         run: echo "THIS_VERSTRING=${{ env.TODAY_IS }}.0.${{ github.run_number }}" >> $GITHUB_ENV
@@ -114,15 +123,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Get Actions Bot ID
-        id: gbid
-        if: github.event_name != 'pull_request'
-        run: |
-          curl --silent \
-          --url https://api.github.com/users/$(printf %s \'${ACTIONS_BOT_NAME}\'|jq -sRr @uri) \
-          --output bot_info.json
-          echo "::set-output name=bot-id::$(cat bot_info.json | jq --raw-output '.id')"
 
       # https://docs.github.com/en/rest/reference/releases#create-a-release
       - name: Make release
