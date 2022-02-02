@@ -80,7 +80,7 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           echo "${{ env.THIS_VERSTRING }} ${{ env.MAIN_PACKAGE_NAME }} ${{ steps.getvver.outputs.remote_ver }}" > VERSION
-          git config --global user.name "${ACTIONS_BOT_NAME}"
+          git config --global user.name "${ACTIONS_BOT_NAME%[*}"
           git config --global user.email "${{ steps.gbid.outputs.bot-id }}+${ACTIONS_BOT_NAME}@users.noreply.github.com"
           git add VERSION
           git commit -m "${{ env.THIS_VERSTRING }} version update"
