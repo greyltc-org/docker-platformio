@@ -6,4 +6,3 @@ ENV PKG_OUT=$PKG_OUT
 
 ADD install-platformio.sh /sbin/install-platformio
 RUN install-platformio
-RUN printenv
