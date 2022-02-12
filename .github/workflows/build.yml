@@ -90,6 +90,7 @@ jobs:
         with:
           load: true
           tags: test
+          target: cleanup-stage
 
       - name: Test the container
         id: test
