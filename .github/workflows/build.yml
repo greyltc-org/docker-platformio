@@ -157,7 +157,7 @@ jobs:
               --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
               --header "Accept: application/vnd.github.v3+json" \
               --header "Content-Type: $(file --brief --mime-type ${ASSET_FILE})" \
-              --data-binary @${asset} \
+              --data-binary @${ASSET_FILE} \
               --output asset_resp.json
             ASSET_URL=$(cat asset_resp.json | jq --raw-output '.url')
             echo "Asset upload done."
@@ -165,7 +165,7 @@ jobs:
             # update asset
             ASSET_NAME="$(basename ${ASSET_FILE})"
             echo "Updating asset..."
-            jq -n --arg arg_name "${ASSET_NAME}" --arg arg_label "teh_label" '{"name":$arg_name,"label":$arg_label}' | curl --verbose --silent \
+            jq -n --arg arg_name "${ASSET_NAME}" '{"name":$arg_name}' | curl --silent \
               --request PATCH \
               --url "${ASSET_URL}" \
               --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
