@@ -134,24 +134,9 @@ jobs:
           target: mkimg-stage
 
       # https://docs.github.com/en/rest/reference/releases#create-a-release
-      - name: Make release
-        if: github.event_name != 'pull_request'
-        run: |
-          ls out/
-          curl --silent \
-            --url https://api.github.com/repos/${{ github.repository }}/releases \
-            --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-            --header "Accept: application/vnd.github.v3+json" \
-            --data '{"draft":false,"tag_name":"v${{ env.THIS_VERSTRING }}","name":"${{ env.MAIN_PACKAGE_NAME }} ${{ steps.test.outputs.PKG_VER }} via ${{ env.THIS_VERSTRING }}"}' \
-            --output rel_resp.json
-          echo "Release Done."
-          ASSET_UL_URL=$(cat rel_resp.json | jq --raw-output '.upload_url' | sed "s|{?.*||g")
-        
-      # https://docs.github.com/en/rest/reference/releases#create-a-release
       - name: Make release and upload assets
         if: github.event_name != 'pull_request'
         run: |
-          ls out/
           curl --silent \
             --url https://api.github.com/repos/${{ github.repository }}/releases \
             --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
