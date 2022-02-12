@@ -2,8 +2,6 @@
 FROM ghcr.io/greyltc-org/archlinux-aur as build-stage
 ADD install-platformio.sh /sbin/install-platformio
 RUN install-platformio
-RUN ls /var/cache/makepkg/pkg
-RUN ls /var/cache/foreign-pkg
 
 FROM scratch AS pkg-export-stage
 COPY --from=build-stage /var/cache/foreign-pkg/* /
