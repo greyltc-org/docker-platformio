@@ -85,21 +85,21 @@ jobs:
           git add VERSION
           git commit -m "${{ env.THIS_VERSTRING }} version update"
 
-      - name: Docker build
+      - name: Build and export packages
         uses: docker/build-push-action@v2
         with:
           tags: export
           target: pkg-export-stage
           outputs: type=local,dest=out
 
-      - name: Docker build
+      - name: Make image
         uses: docker/build-push-action@v2
         with:
           load: true
           tags: testing
           target: mkimg-stage
 
-      - name: Test the container
+      - name: Test image
         id: test
         run: |
           set -eo pipefail
