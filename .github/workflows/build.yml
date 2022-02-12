@@ -90,8 +90,6 @@ jobs:
         with:
           load: true
           tags: test
-          build-args: |
-            PKG_OUT=/home/out
 
       - name: Test the container
         id: test
