@@ -151,6 +151,7 @@ jobs:
           do
             # upload asset
             echo "Uploading asset..."
+            # https://docs.github.com/en/rest/reference/releases#upload-a-release-asset
             curl --silent \
               --url "${ASSET_UL_URL}" \
               --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
@@ -160,10 +161,11 @@ jobs:
               --output asset_resp.json
             ASSET_URL=$(cat asset_resp.json | jq --raw-output '.url')
             echo "Asset upload done."
+            
             # update asset
             ASSET_NAME="$(basename ${ASSET_FILE})"
             echo "Updating asset..."
-            jq -n --arg arg_name "${ASSET_NAME}" '{"name":$arg_name}' | curl --silent \
+            jq -n --arg arg_name "${ASSET_NAME}" --arg arg_label "teh_label" '{"name":$arg_name,"label":$arg_label}' | curl --verbose --silent \
               --request PATCH \
               --url "${ASSET_URL}" \
               --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
