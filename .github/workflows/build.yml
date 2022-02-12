@@ -91,7 +91,7 @@ jobs:
           load: true
           tags: export
           target: pkg-export-stage
-          outputs: local,dest=out
+          outputs: type=local,dest=out
 
       - name: Docker build
         uses: docker/build-push-action@v2
