@@ -5,9 +5,9 @@ Arch Linux based docker container with platformio
 # Usage
 ## Basic
 ```bash
-docker run --name pio-ver --pull=always ghcr.io/greyltc-org/platformio platformio --version
+docker run --name print-ver --pull=always ghcr.io/greyltc-org/platformio platformio --version
 ```
 ## Interactive
 ```
-docker run --name pio-check --pull=always --interactive --tty ghcr.io/greyltc-org/platformio bash
+docker run --name root-shell --pull=always --interactive --tty ghcr.io/greyltc-org/platformio bash
 ```
