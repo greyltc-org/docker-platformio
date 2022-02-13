@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.3.1
+# syntax=docker/dockerfile:1.3.1-labs
 FROM ghcr.io/greyltc-org/archlinux-aur as build-stage
 RUN <<EOF
 #!/usr/bin/env bash
