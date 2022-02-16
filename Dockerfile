@@ -21,3 +21,23 @@ pacman --sync --refresh
 yes|pacman --upgrade --needed --noconfirm --noprogressbar /mnt/foreigns/*
 yes|pacman --sync --clean --clean
 EOF
+
+FROM mkimg-stage AS mkfwb-stage
+RUN <<EOF
+#!/usr/bin/env bash
+set -e
+
+pio platform install --with-package framework-arduino-avr framework-arduino-avr-minicore atmelavr tool-scons
+
+BOARD=megaatmega2560
+mkdir -p ${BOARD}
+platformio init --board ${BOARD} -d ${BOARD}
+pio lib -d ${BOARD} install "arduino-libraries/Ethernet@^2.0.0"  # Arduino's Ethernet library
+
+BOARD=ATmega328PB
+mkdir -p ${BOARD}
+#  --project-options only needed until my wire mods are in MCUdude/MiniCore. see https://github.com/MCUdude/MiniCore/issues/178
+platformio init --board ${BOARD} -d ${BOARD} --project-option "lib_deps = framework-arduino-avr/Wire" --project-option "lib_extra_dirs = \$PROJECT_CORE_DIR/packages/framework-arduino-avr/libraries"
+
+yes | pio system prune
+EOF
