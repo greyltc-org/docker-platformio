@@ -123,6 +123,17 @@ jobs:
             latest=true
           images: ghcr.io/${{ github.repository_owner }}/${{ env.MAIN_PACKAGE_NAME }}
 
+      - name: Docker meta for fw builder
+        id: fw-meta
+        uses: docker/metadata-action@v3
+        with:
+          tags: |
+            type=raw,value=${{ env.THIS_VERSTRING }}
+            type=raw,value=${{ steps.test.outputs.PKG_VER }}
+          flavor: |
+            latest=true
+          images: ghcr.io/${{ github.repository_owner }}/firmware-builder
+
       # Push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
       - name: Push to GitHub package registry
@@ -132,6 +143,16 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           target: mkimg-stage
+
+      # Push Docker image with Buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
+      - name: Push to GitHub package registry
+        uses: docker/build-push-action@v2
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.fw-meta.outputs.tags }}
+          labels: ${{ steps.fw-meta.outputs.labels }}
+          target: mkfwb-stage
 
       # https://docs.github.com/en/rest/reference/releases#create-a-release
       - name: Make release and upload assets
