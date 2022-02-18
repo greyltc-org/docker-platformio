@@ -17,7 +17,7 @@ set -e
 #curl --quiet --follow https://raw.githubusercontent.com/greyltc/docker-archlinux/master/get-new-mirrors.sh > /bin/get-new-mirrors
 #chmod +x /bin/get-new-mirrors
 #get-new-mirrors
-pacman --sync --refresh
+pacman --files --refresh
 yes|pacman --upgrade --needed --noconfirm --noprogressbar /mnt/foreigns/*
 yes|pacman --sync --clean --clean
 EOF
@@ -27,7 +27,7 @@ RUN <<EOF
 #!/usr/bin/env bash
 set -e
 
-pio platform install atmelavr --with-package framework-arduino-avr --with-package framework-arduino-avr-minicore --with-package framework-arduino-mbed
+pio platform install atmelavr --with-package framework-arduino-avr --with-package framework-arduino-avr-minicore
 pio platform install ststm32 --with-package framework-arduino-mbed
 
 BOARD=megaatmega2560
