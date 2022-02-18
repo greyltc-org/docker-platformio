@@ -17,7 +17,7 @@ set -e
 #curl --quiet --follow https://raw.githubusercontent.com/greyltc/docker-archlinux/master/get-new-mirrors.sh > /bin/get-new-mirrors
 #chmod +x /bin/get-new-mirrors
 #get-new-mirrors
-pacman --files --refresh
+pacman --sync --refresh
 yes|pacman --upgrade --needed --noconfirm --noprogressbar /mnt/foreigns/*
 yes|pacman --sync --clean --clean
 EOF
