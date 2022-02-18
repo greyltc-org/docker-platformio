@@ -10,6 +10,7 @@ EOF
 FROM scratch AS pkg-export-stage
 COPY --from=build-stage /var/cache/foreign-pkg/* /
 
+# images from this step are currently published by CI as ghcr.io/greyltc-org/platformio
 FROM archlinux/archlinux:base AS mkimg-stage
 RUN --mount=type=bind,target=/mnt/foreigns,source=/var/cache/foreign-pkg,from=build-stage <<EOF
 #!/usr/bin/env bash
@@ -17,11 +18,12 @@ set -e
 #curl --quiet --follow https://raw.githubusercontent.com/greyltc/docker-archlinux/master/get-new-mirrors.sh > /bin/get-new-mirrors
 #chmod +x /bin/get-new-mirrors
 #get-new-mirrors
-pacman --sync --refresh
+pacman --sync --refresh --needed --noconfirm avrdude dfu-util  # NOTE: this probably needs --sysupgrade
 yes|pacman --upgrade --needed --noconfirm --noprogressbar /mnt/foreigns/*
 yes|pacman --sync --clean --clean
 EOF
 
+# images from this step are currently published by CI as ghcr.io/greyltc-org/firmware-builder
 FROM mkimg-stage AS mkfwb-stage
 RUN <<EOF
 #!/usr/bin/env bash
