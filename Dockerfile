@@ -17,7 +17,7 @@ FROM archlinux/archlinux:base AS mkimg-stage
 RUN --mount=type=bind,target=/mnt/foreigns,source=/var/cache/foreign-pkg,from=build-stage <<EOF
 #!/usr/bin/env bash
 set -e
-# set -o pipefail  # often causes death
+#set -o pipefail  # often causes death
 
 #curl --quiet --follow https://raw.githubusercontent.com/greyltc/docker-archlinux/master/get-new-mirrors.sh > /bin/get-new-mirrors
 #chmod +x /bin/get-new-mirrors
@@ -32,7 +32,7 @@ FROM mkimg-stage AS mkfwb-stage
 RUN <<EOF
 #!/usr/bin/env bash
 set -e
-set -o pipefail
+#set -o pipefail  # often causes death
 
 pio platform install atmelavr --with-package framework-arduino-avr --with-package framework-arduino-avr-minicore
 pio platform install ststm32 --with-package framework-arduino-mbed
