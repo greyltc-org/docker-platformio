@@ -3,6 +3,8 @@ FROM ghcr.io/greyltc-org/archlinux-aur as build-stage
 RUN <<EOF
 #!/usr/bin/env bash
 set -e
+set -o pipefail
+
 get-new-mirrors
 aur-install platformio
 EOF
@@ -15,6 +17,8 @@ FROM archlinux/archlinux:base AS mkimg-stage
 RUN --mount=type=bind,target=/mnt/foreigns,source=/var/cache/foreign-pkg,from=build-stage <<EOF
 #!/usr/bin/env bash
 set -e
+set -o pipefail
+
 #curl --quiet --follow https://raw.githubusercontent.com/greyltc/docker-archlinux/master/get-new-mirrors.sh > /bin/get-new-mirrors
 #chmod +x /bin/get-new-mirrors
 #get-new-mirrors
@@ -28,6 +32,7 @@ FROM mkimg-stage AS mkfwb-stage
 RUN <<EOF
 #!/usr/bin/env bash
 set -e
+set -o pipefail
 
 pio platform install atmelavr --with-package framework-arduino-avr --with-package framework-arduino-avr-minicore
 pio platform install ststm32 --with-package framework-arduino-mbed
