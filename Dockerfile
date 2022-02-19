@@ -22,7 +22,7 @@ set -o pipefail
 #curl --quiet --follow https://raw.githubusercontent.com/greyltc/docker-archlinux/master/get-new-mirrors.sh > /bin/get-new-mirrors
 #chmod +x /bin/get-new-mirrors
 #get-new-mirrors
-pacman --sync --refresh --needed --noconfirm avrdude dfu-util  # NOTE: this probably needs --sysupgrade
+pacman --sync --refresh --needed --noconfirm avrdude dfu-util python-intelhex  # NOTE: this probably needs --sysupgrade
 yes|pacman --upgrade --needed --noconfirm --noprogressbar /mnt/foreigns/*
 yes|pacman --sync --clean --clean
 EOF
