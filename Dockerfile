@@ -36,6 +36,7 @@ BOARD=megaatmega2560
 mkdir -p ${BOARD}
 platformio init --board ${BOARD} --project-dir ${BOARD}
 pio lib --storage-dir ${BOARD} install "arduino-libraries/Ethernet@^2.0.0"  # Arduino's Ethernet library
+pio lib --storage-dir ${BOARD} install "adafruit/Adafruit ADS1X15@^2.4.0"  # ADC library
 pio run --project-dir ${BOARD} || echo "${BOARD} ready"  # download&prepare platformio/tool-scons, generates expected errors but can't figure out how to get it otherwise
 pio run --project-dir ${BOARD} --target upload || echo "${BOARD} upload ready"  # download&prepare platformio/tool-avrdude, generates expected errors but can't figure out how to get it otherwise
 
