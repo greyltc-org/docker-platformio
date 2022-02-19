@@ -17,7 +17,7 @@ FROM archlinux/archlinux:base AS mkimg-stage
 RUN --mount=type=bind,target=/mnt/foreigns,source=/var/cache/foreign-pkg,from=build-stage <<EOF
 #!/usr/bin/env bash
 set -e
-set -o pipefail
+# set -o pipefail  # often causes death
 
 #curl --quiet --follow https://raw.githubusercontent.com/greyltc/docker-archlinux/master/get-new-mirrors.sh > /bin/get-new-mirrors
 #chmod +x /bin/get-new-mirrors
