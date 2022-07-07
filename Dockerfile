@@ -40,7 +40,7 @@ pio platform install ststm32 --with-package framework-arduino-mbed
 BOARD=megaatmega2560
 mkdir -p ${BOARD}
 platformio init --board ${BOARD} --project-dir ${BOARD}
-pio lib --storage-dir ${BOARD} install "arduino-libraries/Ethernet@^2.0.0"  # Arduino's Ethernet library
+pio lib --storage-dir ${BOARD} install "arduino-libraries/Ethernet@^2.0.1"  # Arduino's Ethernet library
 pio lib --storage-dir ${BOARD} install "adafruit/Adafruit ADS1X15@^2.4.0"  # ADC library
 pio lib --storage-dir ${BOARD} install "adafruit/Adafruit BusIO@^1.11.1"  # abstracts away UART, I2C and SPI interfacing
 pio run --project-dir ${BOARD} || echo "${BOARD} ready"  # download&prepare platformio/tool-scons, generates expected errors but can't figure out how to get it otherwise
