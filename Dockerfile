@@ -53,7 +53,7 @@ pio pkg install --project-dir ${BOARD} --library "adafruit/Adafruit BusIO"  # ab
 
 BOARD=ATmega328PB
 mkdir -p ${BOARD}
-platformio init --board ${BOARD} --project-dir ${BOARD}  --project-option "lib_deps = framework-arduino-avr/Wire"
+platformio init --board ${BOARD} --project-dir ${BOARD}
 pio pkg install --project-dir ${BOARD} --tool "platformio/tool-scons"
 pio pkg install --project-dir ${BOARD} --tool "platformio/tool-avrdude"
 pio pkg install --project-dir ${BOARD} --tool "platformio/framework-arduino-avr"
