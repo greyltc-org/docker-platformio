@@ -40,24 +40,36 @@ pio platform install ststm32 --with-package framework-arduino-mbed
 BOARD=megaatmega2560
 mkdir -p ${BOARD}
 platformio init --board ${BOARD} --project-dir ${BOARD}
-pio lib --storage-dir ${BOARD} install "arduino-libraries/Ethernet@^2.0.1"  # Arduino's Ethernet library
-pio lib --storage-dir ${BOARD} install "adafruit/Adafruit ADS1X15@^2.4.0"  # ADC library
-pio lib --storage-dir ${BOARD} install "adafruit/Adafruit BusIO@^1.11.1"  # abstracts away UART, I2C and SPI interfacing
-pio run --project-dir ${BOARD} || echo "${BOARD} ready"  # download&prepare platformio/tool-scons, generates expected errors but can't figure out how to get it otherwise
-pio run --project-dir ${BOARD} --target upload || echo "${BOARD} upload ready"  # download&prepare platformio/tool-avrdude, generates expected errors but can't figure out how to get it otherwise
+pio pkg install --project-dir ${BOARD} --tool "platformio/tool-scons"
+pio pkg install --project-dir ${BOARD} --tool "platformio/tool-avrdude"
+pio pkg install --project-dir ${BOARD} --library "arduino-libraries/Ethernet"  # Arduino's Ethernet library
+pio pkg install --project-dir ${BOARD} --library "adafruit/Adafruit ADS1X15"   # ADC library
+pio pkg install --project-dir ${BOARD} --library "adafruit/Adafruit BusIO"  # abstracts away UART, I2C and SPI interfacing
+#pio lib --storage-dir ${BOARD} install "arduino-libraries/Ethernet@^2.0.1"  # Arduino's Ethernet library
+#pio lib --storage-dir ${BOARD} install "adafruit/Adafruit ADS1X15@^2.4.0"  # ADC library
+#pio lib --storage-dir ${BOARD} install "adafruit/Adafruit BusIO@^1.11.1"  # abstracts away UART, I2C and SPI interfacing
+#pio run --project-dir ${BOARD} || echo "${BOARD} ready"  # download&prepare platformio/tool-scons, generates expected errors but can't figure out how to get it otherwise
+#pio run --project-dir ${BOARD} --target upload || echo "${BOARD} upload ready"  # download&prepare platformio/tool-avrdude, generates expected errors but can't figure out how to get it otherwise
 
 BOARD=ATmega328PB
 mkdir -p ${BOARD}
+platformio init --board ${BOARD} --project-dir ${BOARD}  --project-option "lib_deps = framework-arduino-avr/Wire"
+pio pkg install --project-dir ${BOARD} --tool "platformio/tool-scons"
+pio pkg install --project-dir ${BOARD} --tool "platformio/tool-avrdude"
+pio pkg install --project-dir ${BOARD} --tool "platformio/framework-arduino-avr"
 #  --project-options only needed until my wire mods are in MCUdude/MiniCore. see https://github.com/MCUdude/MiniCore/issues/178
-platformio init --board ${BOARD} --project-dir ${BOARD} --project-option "lib_deps = framework-arduino-avr/Wire" --project-option "lib_extra_dirs = \$PROJECT_CORE_DIR/packages/framework-arduino-avr/libraries"
-pio run --project-dir ${BOARD} || echo "${BOARD} ready"  # download&prepare platformio/tool-scons, generates expected errors but can't figure out how to get it otherwise
-pio run --project-dir ${BOARD} --target upload || echo "${BOARD} upload ready"  # download&prepare platformio/tool-avrdude, generates expected errors but can't figure out how to get it otherwise
+#platformio init --board ${BOARD} --project-dir ${BOARD} --project-option "lib_deps = framework-arduino-avr/Wire" --project-option "lib_extra_dirs = \$PROJECT_CORE_DIR/packages/framework-arduino-avr/libraries"
+#pio run --project-dir ${BOARD} || echo "${BOARD} ready"  # download&prepare platformio/tool-scons, generates expected errors but can't figure out how to get it otherwise
+#pio run --project-dir ${BOARD} --target upload || echo "${BOARD} upload ready"  # download&prepare platformio/tool-avrdude, generates expected errors but can't figure out how to get it otherwise
 
 BOARD=portenta_h7_m7
 mkdir -p ${BOARD}
 platformio init --board ${BOARD} --project-dir ${BOARD}
-pio run --project-dir ${BOARD} || echo "${BOARD} ready"  # download&prepare platformio/tool-dfuutil, generates expected errors but can't figure out how to get it otherwise
-pio run --project-dir ${BOARD} --target upload || echo "${BOARD} upload ready"  # download&prepare platformio/tool-openocd, platformio/tool-stm32duino, generates expected errors but can't figure out how to get it otherwise
+pio pkg install --project-dir ${BOARD} --tool "platformio/tool-dfuutil"
+pio pkg install --project-dir ${BOARD} --tool "platformio/tool-openocd"
+pio pkg install --project-dir ${BOARD} --tool "platformio/tool-stm32duino"
+#pio run --project-dir ${BOARD} || echo "${BOARD} ready"  # download&prepare platformio/tool-dfuutil, generates expected errors but can't figure out how to get it otherwise
+#pio run --project-dir ${BOARD} --target upload || echo "${BOARD} upload ready"  # download&prepare platformio/tool-openocd, platformio/tool-stm32duino, generates expected errors but can't figure out how to get it otherwise
 
 yes | pio system prune
 EOF
