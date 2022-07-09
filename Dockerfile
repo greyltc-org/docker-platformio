@@ -55,7 +55,7 @@ pio pkg install --project-dir ${BOARD} --library "adafruit/Adafruit BusIO"  # ab
 
 BOARD=ATmega328PB
 mkdir -p ${BOARD}
-platformio init --board ${BOARD} --project-dir ${BOARD}
+platformio init --board ${BOARD} --project-dir ${BOARD} --project-option "lib_deps = framework-arduino-avr/Wire" --project-option "lib_extra_dirs = \$PROJECT_CORE_DIR/packages/framework-arduino-avr/libraries" --no-install-dependencies
 pio pkg install --project-dir ${BOARD} --platform "atmelavr"
 pio pkg install --project-dir ${BOARD} --tool "platformio/framework-arduino-avr-minicore"
 pio pkg install --project-dir ${BOARD} --tool "platformio/framework-arduino-avr"
