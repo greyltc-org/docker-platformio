@@ -23,8 +23,8 @@ set -o pipefail  # often causes death
 #chmod +x /bin/get-new-mirrors
 #get-new-mirrors
 pacman --sync --refresh --needed --noconfirm avrdude dfu-util python-intelhex  # NOTE: this probably needs --sysupgrade
-yes|pacman --upgrade --needed --noconfirm --noprogressbar /mnt/foreigns/*
-yes|pacman --sync --clean --clean
+(yes || true) | pacman --upgrade --needed --noconfirm --noprogressbar /mnt/foreigns/*
+(yes || true) | pacman --sync --clean --clean
 EOF
 
 # images from this step are currently published by CI as ghcr.io/greyltc-org/firmware-builder
@@ -63,5 +63,5 @@ pio pkg install --project-dir ${BOARD} --tool "platformio/tool-dfuutil"
 pio pkg install --project-dir ${BOARD} --tool "platformio/tool-openocd"
 pio pkg install --project-dir ${BOARD} --tool "platformio/tool-stm32duino"
 
-yes | pio system prune || echo "pio prune complete"
+(yes || true) | pio system prune
 EOF
