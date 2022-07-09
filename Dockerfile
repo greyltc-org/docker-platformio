@@ -17,7 +17,7 @@ FROM archlinux/archlinux:base AS mkimg-stage
 RUN --mount=type=bind,target=/mnt/foreigns,source=/var/cache/foreign-pkg,from=build-stage <<EOF
 #!/usr/bin/env bash
 set -e
-#set -o pipefail  # often causes death
+set -o pipefail  # often causes death
 
 #curl --quiet --follow https://raw.githubusercontent.com/greyltc/docker-archlinux/master/get-new-mirrors.sh > /bin/get-new-mirrors
 #chmod +x /bin/get-new-mirrors
@@ -63,5 +63,5 @@ pio pkg install --project-dir ${BOARD} --tool "platformio/tool-dfuutil"
 pio pkg install --project-dir ${BOARD} --tool "platformio/tool-openocd"
 pio pkg install --project-dir ${BOARD} --tool "platformio/tool-stm32duino"
 
-yes | pio system prune
+yes | pio system prune || echo "pio prune complete"
 EOF
