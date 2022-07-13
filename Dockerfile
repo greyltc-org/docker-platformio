@@ -6,7 +6,6 @@ set -e
 set -o pipefail
 
 get-new-mirrors
-pacman --sync --refresh --sysupgrade --noconfirm --needed patch
 aur-install platformio
 EOF
 
@@ -20,7 +19,7 @@ RUN --mount=type=bind,target=/mnt/foreigns,source=/var/cache/foreign-pkg,from=bu
 set -e
 set -o pipefail
 
-pacman --sync --refresh --sysupgrade --noconfirm --needed avrdude dfu-util python-intelhex
+pacman --sync --refresh --sysupgrade --noconfirm --needed avrdude dfu-util python-intelhex patch
 (yes || true) | pacman --upgrade --needed --noconfirm --noprogressbar /mnt/foreigns/*
 (yes || true) | pacman --sync --clean --clean
 EOF
@@ -42,6 +41,8 @@ pio pkg install --project-dir ${BOARD} --tool "platformio/tool-avrdude"
 pio pkg install --project-dir ${BOARD} --library "arduino-libraries/Ethernet"  # Arduino's Ethernet library
 pio pkg install --project-dir ${BOARD} --library "adafruit/Adafruit ADS1X15"   # ADC library
 pio pkg install --project-dir ${BOARD} --library "adafruit/Adafruit BusIO"  # abstracts away UART, I2C and SPI interfacing
+# patch the core-avr Wire library to remember last slave address
+curl --silent https://github.com/arduino/ArduinoCore-avr/compare/1.8.5...greyltc:ArduinoCore-avr:remember-slave-address.patch | patch -d "/root/.platformio/packages/framework-arduino-avr" -p1
 
 BOARD=ATmega328PB
 mkdir -p ${BOARD}
@@ -51,9 +52,6 @@ pio pkg install --project-dir ${BOARD} --tool "platformio/framework-arduino-avr-
 pio pkg install --project-dir ${BOARD} --tool "platformio/framework-arduino-avr"
 pio pkg install --project-dir ${BOARD} --tool "platformio/tool-scons"
 pio pkg install --project-dir ${BOARD} --tool "platformio/tool-avrdude"
-
-# patch the wire library to remember last slave address
-curl --silent https://github.com/arduino/ArduinoCore-avr/compare/1.8.5...greyltc:ArduinoCore-avr:remember-slave-address.patch | patch -d "/root/.platformio/packages/framework-arduino-avr" -p1
 
 BOARD=portenta_h7_m7
 mkdir -p ${BOARD}
